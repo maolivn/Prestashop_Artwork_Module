@@ -3,7 +3,6 @@ var SCALE_FACTOR = 1.1;
 var canvasScale = 1;
 var canvas = null;
 var state, state_undo = [], state_redo = [];
-//var frame = 1;
 var frame;
 $(document).ready(function () {
     //Remove Customize Tabs
@@ -354,15 +353,33 @@ function frame_update(activeObject) {
 }
 function createRect() {
     var rect;
-    /** Calculate new width with aspet ratio base on dimension from admin
+
+    /** Calculate new frame width with aspect ratio base on dimension from admin
      * new height = original height / original width x new width
      * new width = original width / original height x new height
      */
-    var new_width = (canvas.getWidth() - 40) / parseInt(frame);
+
+    /*BOF Calcualte width */
+    var frame_width;
+    var original_width = $('#simulacion_form').find('#width').val();
+    var original_height = $('#simulacion_form').find('#height').val();
+
+    var new_width = Math.round(original_width / original_height * canvas.getHeight());
+    if(new_width > canvas.getWidth()){
+        for( var f = 0 ; new_width > canvas.getWidth() ; f++) {
+            frame_width = new_width / f;
+        }
+    } else {
+        frame_width = new_width;
+    }
+
+//    var new_width = (canvas.getWidth() - 40) / parseInt(frame);
+    /*EOF Calcualte width */
+
     var left = 0;
     rect = new fabric.Rect({
         left: left, top: 0,
-        width: new_width, height: 450,
+        width: frame_width, height: 530,
         fill: 'transparent',
         strokeWidth: 1, stroke: '#040204',
     });
