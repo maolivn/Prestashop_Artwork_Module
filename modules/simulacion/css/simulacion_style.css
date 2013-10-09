@@ -1,0 +1,102 @@
+#control_container a{
+    color: #000000;
+    font-weight: bold;
+}
+.title {
+    font-size: 110%;
+    font-weight: bold;
+    text-align: center;
+}
+.sections {text-align: center}
+div.title {
+    color: #000000;
+    background-color: #ececec;
+}
+.border_top {
+    border-top: 1px solid #ececec;
+    margin-top: 5px;
+}
+.do-icon {
+    display: block;
+    width: 35px;
+    height: 35px;
+    text-indent: -9999px;
+}
+.scale_value,.filter_value{
+    background-color: #f0f0f0;
+    padding: 4px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+#pad_left {float: right}
+#pad_right {float: left}
+#pad_left,#pad_right {position: relative; top: 60px}
+
+.rotate_center{
+    font-size: 20px;
+    position: relative;
+    top: 30px;
+}
+.arrow-down,.arrow-up {
+    display: block;
+    height: 30px;
+    width: 13px;
+}
+.arrow-right, .arrow-left {
+    display: block;
+    height: 13px;
+    width: 30px;
+}
+.arrow-right {
+    background-image: url("../img/ArrowRight.png");
+    margin-left: 5px;
+}
+.arrow-left {
+    background-image: url("../img/ArrowLeft.png");
+    margin-right: 5px;
+}
+.arrow-down {
+    background-image: url("../img/ArrowDown.png");
+    margin-top: 5px;
+}
+.arrow-up {
+    background-image: url("../img/ArrowUp.png");
+    margin-bottom: 5px;
+ }
+#scale_plus{
+    background-image: url("../img/plus-52.gif");
+}
+#scale_minus{
+    background-image: url("../img/minus-52.gif");
+}
+#plus {
+    background-image: url("../img/rotate_right-icon-52.gif");
+}
+#minus {
+    background-image: url("../img/rotate_left-icon-52.gif");
+}
+#pad_control {
+    background-color: #ECECEC;
+    padding: 0;
+    width: 100%;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+#move_pad {
+    background-color: #ffffff;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    padding: 8px;
+}
+#quality_text {
+    color: #ff0000;
+    font-weight: bold;
+    font-size: 16px;
+}
+#js_container {
+    position: relative;
+}
