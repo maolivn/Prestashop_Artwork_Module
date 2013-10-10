@@ -8,7 +8,7 @@ class Simulacion extends Module
         $this->name          = 'simulacion';
         $this->tab           = 'front_office_features';
         $this->version       = '1.0';
-        $this->author        = 'Tan Phan';
+        $this->author        = 'Tan Phan - tanitct89@gmail.com';
         $this->need_instance = 0;
 
         parent::__construct();
