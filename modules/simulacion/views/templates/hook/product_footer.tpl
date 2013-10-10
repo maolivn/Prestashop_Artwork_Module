@@ -3,7 +3,6 @@
     {if $field.type == 0}
         <div class="customizationUploadLine{if $field.required} required{/if}">
             {assign var='key' value='pictures_'|cat:$product->id|cat:'_'|cat:$field.id_customization_field}
-            {*{$pictures|print_r}*}
             {if isset($pictures.$key)}
                 <div class="customizationUploadBrowse">
                     <img src="{$pic_dir}{$pictures.$key}" alt="" style="width: 150px;" />
@@ -22,13 +21,30 @@
         $('#save_canvas').click(function (e) {
             e.preventDefault();
             var frame = canvas.item(1);
+            var frame_obj = frame.getObjects();
             var img = canvas.item(0);
+            var file, dataURL;
+            var owidth = $('#simulacion_form').find('#width').val();
+            var oheight = $('#simulacion_form').find('#height').val();
+            var scale = Math.round(owidth / img.width);
+
             img.opacity = 1;
-            canvas.remove(frame);
-            var dataURL = img.toDataURL({format: 'png', quality: 1});
-            var file = dataURLtoBlob(dataURL);
-            /*alert(img.width / canvas.getWidth());
+            //canvas.remove(frame);
+
+            frame_obj[0].stroke = 'transparent';
+            /*$.each(frame_obj, function(i) {
+                frame_obj[i].stroke = 'transparent';
+                canvas.renderAll();
+            });*/
+
+            canvas.renderAll();
+            dataURL = frame_obj[0].toDataURL({'multiplier': scale});
+            file = dataURLtoBlob(dataURL);
+
+            /*$.colorbox.close();
+            $('#image-block').html('<img src="'+dataURL+'">');
             return false;*/
+
             // Create new form data
             var fd = new FormData();
             var name = $('.customizationUploadBrowse').find('input[type="file"]').attr('name');
@@ -38,7 +54,7 @@
 
             //Send canvas image file to server
             $.ajax({
-                url: '{/literal}{$module_link}{literal}&upload=1&id_product=' + $('#product_page_product_id').val() +' &img_width = '+ img.width + ' &img_heigth = '+ img.height,
+                url: '{/literal}{$module_link}{literal}&upload=1&id_product=' + $('#product_page_product_id').val() +'&img_width='+ owidth + '&img_heigth='+ oheight,
                 type: "POST",
                 data: fd,
                 processData: false,
@@ -47,8 +63,9 @@
                     $.colorbox.close();
                     $.fancybox('<h5>Processing...</h5>', {modal: true});
                 }
-            }).done(function (respond) {
-                        $.fancybox('<h5>Save Completed</h5>', {modal: true});
+            }).done(function (response) {
+//                        alert(response); return false;
+                        $.fancybox('<h5>' + response + '</h5>', {modal: true});
                         location.replace('{/literal}{$link->getProductLink($id_product)}{literal}');
                     });
         });

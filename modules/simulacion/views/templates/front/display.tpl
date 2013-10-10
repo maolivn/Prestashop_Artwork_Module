@@ -145,7 +145,7 @@
                     {*<span><button id="add_cart" class="state_change btn btn-primary">Add To Cart</button></span>*}
                     <div class="col-md-12" style="margin-top: 10px">
                         {*<input type="submit" class="exclusive" value="Add to cart" name="Submit">*}
-                        <button onclick="javascript:$.colorbox.close();location.reload();" type="button" class="btn btn-primary" id="cancel_canvas">{l s='Cancel' mod='simulacion'}</button>
+                        <button onclick="closeCanvas();" type="button" class="btn btn-primary" id="cancel_canvas">{l s='Cancel' mod='simulacion'}</button>
                         <button type="button" class="btn btn-primary" id="save_canvas">{l s='Save' mod='simulacion'}</button>
                     </div>
                 </div>

@@ -36,12 +36,12 @@ $(function () {
         e.preventDefault();
         canvasSaveState();
 //        var percent = $(this).parents('.control_group').find('.scale_value');
-        var value = parseInt(percent.attr('data-count'));
+//        var value = parseInt(percent.attr('data-count'));
         if ($(this).attr('id') == 'scale_plus') {
-            value = value + 10;
+//            value = value + 10;
             zoomIn();
         } else {
-            value = value - 10;
+//            value = value - 10;
             zoomOut();
         }
 //        percent.html(value + '%');
@@ -244,13 +244,15 @@ function initStage(image) {
     var real_img_width = imgInstance.getWidth() * 02645833333333;
     var real_width = $('#width').val()* 02645833333333;
 
-    var fixed_percent = real_img_width * 100 / real_width;
+    var fixed_percent = Math.round(real_img_width * 100 / real_width);
     if (0 < fixed_percent && fixed_percent < 40) {
         quality = 'Low Quality';
-    } else if (40 < fixed_percent && fixed_percent < 60) {
+    } else if (40 <= fixed_percent && fixed_percent < 60) {
         quality = 'Medium Quality';
-    } else {
+    } else if (fixed_percent >= 60) {
         quality = 'High Quality';
+    } else {
+        quality = 'Undefined Quality';
     }
 
     $('#quality_text').html(quality);
@@ -359,29 +361,31 @@ function createRect() {
      * new width = original width / original height x new height
      */
 
+    // TODO Ratio calculate script
     /*BOF Calcualte width */
-    var frame_width;
+    var frame_height, divide;
+    var canvas_width = canvas.getWidth(), canvas_height = canvas.getHeight();
     var original_width = $('#simulacion_form').find('#width').val();
     var original_height = $('#simulacion_form').find('#height').val();
-
-    var new_width = Math.round(original_width / original_height * canvas.getHeight());
-    if(new_width > canvas.getWidth()){
-        for( var f = 0 ; new_width > canvas.getWidth() ; f++) {
-            frame_width = new_width / f;
-        }
+    var frame_width = (canvas.getWidth() - 40) / parseInt(frame);
+    var new_height = original_height /original_width  * canvas_width;
+//    var new_width = Math.round(original_width / original_height * canvas_height);
+;
+    if (new_height > canvas_height) {
+        divide = new_height / canvas_height;
+        frame_height = canvas_height - 10;
+        frame_width = (frame_width / divide) - 10;
     } else {
-        frame_width = new_width;
+        frame_height = new_height;
     }
-
-//    var new_width = (canvas.getWidth() - 40) / parseInt(frame);
     /*EOF Calcualte width */
 
     var left = 0;
     rect = new fabric.Rect({
         left: left, top: 0,
-        width: frame_width, height: 530,
+        width: Math.round(frame_width), height: Math.round(frame_height),
         fill: 'transparent',
-        strokeWidth: 1, stroke: '#040204',
+        stroke: '#040204'
     });
 
     var rect_group = [];
@@ -503,7 +507,6 @@ function dataURLtoBlob(dataURL) {
 }
 
 function createNewSepia() {
-    // TODO create exact sepia image filter
     // set of sepia colors
 //    var r, g , b, avg;
     var r = [0, 0, 0, 1, 1, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 12, 12, 12, 12, 13, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 17, 18, 19, 19, 20, 21, 22, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 39, 40, 41, 42, 44, 45, 47, 48, 49, 52, 54, 55, 57, 59, 60, 62, 65, 67, 69, 70, 72, 74, 77, 79, 81, 83, 86, 88, 90, 92, 94, 97, 99, 101, 103, 107, 109, 111, 112, 116, 118, 120, 124, 126, 127, 129, 133, 135, 136, 140, 142, 143, 145, 149, 150, 152, 155, 157, 159, 162, 163, 165, 167, 170, 171, 173, 176, 177, 178, 180, 183, 184, 185, 188, 189, 190, 192, 194, 195, 196, 198, 200, 201, 202, 203, 204, 206, 207, 208, 209, 211, 212, 213, 214, 215, 216, 218, 219, 219, 220, 221, 222, 223, 224, 225, 226, 227, 227, 228, 229, 229, 230, 231, 232, 232, 233, 234, 234, 235, 236, 236, 237, 238, 238, 239, 239, 240, 241, 241, 242, 242, 243, 244, 244, 245, 245, 245, 246, 247, 247, 248, 248, 249, 249, 249, 250, 251, 251, 252, 252, 252, 253, 254, 254, 254, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255],
@@ -563,4 +566,10 @@ function createNewSepia() {
     fabric.Image.filters.NewSepia.fromObject = function (object) {
         return new fabric.Image.filters.NewSepia(object);
     };
+}
+
+function closeCanvas() {
+    canvas.clear;
+    $.colorbox.close();
+    location.reload();
 }

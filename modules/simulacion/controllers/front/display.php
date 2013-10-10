@@ -22,6 +22,7 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         //Saving product customize
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ((int)Tools::getValue('upload') == 1) {
+//                echo Tools::getValue('img_width'); exit;
                 // If cart has not been saved, we need to do it so that customization fields can have an id_cart
                 // We check that the cookie exists first to avoid ghost carts
                 if (!$this->context->cart->id && isset($_COOKIE[$this->context->cookie->getName()])) {
@@ -29,13 +30,19 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                     $this->context->cookie->id_cart = (int)$this->context->cart->id;
                 }
                 if($this->pictureUpload((int)Tools::getValue('img_width'), (int)Tools::getValue('img_heigth'))){
-                    print('file uploaded');
+                    echo 'Save Completed';
                     exit;
                 }
             }
         }
     }
 
+    /**
+     * @param $width
+     * @param $heigth
+     * @return bool|string
+     * Override function from Front Product Controller
+     */
     protected function pictureUpload($width, $heigth)
     {
         if (!$field_ids = $this->product->getCustomizationFieldIds())
@@ -62,11 +69,11 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                     return 'Can not upload file';
 
                 /* Original file */
-                if (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name, $width, $heigth)){
+                if (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name, $width, $heigth)){
                     return 'An error occurred during the image upload process.';
                 }
                 /* A smaller one */
-                elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', $product_picture_width, $product_picture_height)){
+                elseif (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', $product_picture_width, $product_picture_height)){
                     return 'An error occurred during the image upload process.';
                 }
                 elseif (!chmod(_PS_UPLOAD_DIR_.$file_name, 0777) || !chmod(_PS_UPLOAD_DIR_.$file_name.'_small', 0777)){
@@ -78,5 +85,74 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
             }
         }
         return true;
+    }
+
+    /**
+     * @param $src_file
+     * @param $dst_file
+     * @param null $dst_width
+     * @param null $dst_height
+     * @param string $file_type
+     * @param bool $force_type
+     * @return bool
+     * Override function from Image Manager class
+     */
+    protected static function resize($src_file, $dst_file, $dst_width = null, $dst_height = null, $file_type = 'jpg', $force_type = false)
+    {
+        if (PHP_VERSION_ID < 50300)
+            clearstatcache();
+        else
+            clearstatcache(true, $src_file);
+
+        if (!file_exists($src_file) || !filesize($src_file))
+            return false;
+        list($src_width, $src_height, $type) = getimagesize($src_file);
+
+        // If PS_IMAGE_QUALITY is activated, the generated image will be a PNG with .jpg as a file extension.
+        // This allow for higher quality and for transparency. JPG source files will also benefit from a higher quality
+        // because JPG reencoding by GD, even with max quality setting, degrades the image.
+        if (Configuration::get('PS_IMAGE_QUALITY') == 'png_all'
+            || (Configuration::get('PS_IMAGE_QUALITY') == 'png' && $type == IMAGETYPE_PNG) && !$force_type)
+            $file_type = 'png';
+
+        if (!$src_width)
+            return false;
+        if (!$dst_width)
+            $dst_width = $src_width;
+        if (!$dst_height)
+            $dst_height = $src_height;
+
+        $width_diff = $dst_width / $src_width;
+        $height_diff = $dst_height / $src_height;
+
+        if ($width_diff > 1 && $height_diff > 1)
+        {
+            $next_width = $src_width;
+            $next_height = $src_height;
+        }
+        else
+        {
+            if (Configuration::get('PS_IMAGE_GENERATION_METHOD') == 2 || (!Configuration::get('PS_IMAGE_GENERATION_METHOD') && $width_diff > $height_diff))
+            {
+                $next_height = $dst_height;
+                $next_width = round(($src_width / $src_height) * $next_height);
+                $dst_width = (int)(!Configuration::get('PS_IMAGE_GENERATION_METHOD') ? $dst_width : $next_width);
+            }
+            else
+            {
+                $next_width = $dst_width;
+                $next_height = round(($src_height / $src_width) * $next_width);
+                $dst_height = (int)(!Configuration::get('PS_IMAGE_GENERATION_METHOD') ? $dst_height : $next_height);
+            }
+        }
+
+        if (!ImageManager::checkImageMemoryLimit($src_file))
+            return false;
+
+        $dest_image = imagecreatetruecolor($dst_width, $dst_height);
+        $src_image = ImageManager::create($type, $src_file);
+
+        imagecopyresampled($dest_image, $src_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
+        return (ImageManager::write($file_type, $dest_image, $dst_file));
     }
 }
