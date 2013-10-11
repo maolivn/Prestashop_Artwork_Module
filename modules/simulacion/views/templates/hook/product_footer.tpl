@@ -31,14 +31,14 @@
             img.opacity = 1;
             //canvas.remove(frame);
 
-            frame_obj[0].stroke = 'transparent';
-            /*$.each(frame_obj, function(i) {
+//            frame_obj[2].stroke = 'transparent';
+            $.each(frame_obj, function(i) {
                 frame_obj[i].stroke = 'transparent';
-                canvas.renderAll();
-            });*/
-
+            });
+            frame.backgroundColor = '#BC2500';
             canvas.renderAll();
-            dataURL = frame_obj[0].toDataURL({'multiplier': scale});
+
+            dataURL = frame.toDataURL();
             file = dataURLtoBlob(dataURL);
 
             /*$.colorbox.close();
@@ -61,10 +61,9 @@
                 contentType: false,
                 beforeSend: function () {
                     $.colorbox.close();
-                    $.fancybox('<h5>Processing...</h5>', {modal: true});
+                    $.fancybox('<div id="loading_container"><h5>Processing...</h5><div id="loading"></div></div>', {modal: true});
                 }
             }).done(function (response) {
-//                        alert(response); return false;
                         $.fancybox('<h5>' + response + '</h5>', {modal: true});
                         location.replace('{/literal}{$link->getProductLink($id_product)}{literal}');
                     });

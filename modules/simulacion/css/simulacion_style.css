@@ -100,3 +100,14 @@ div.title {
 #js_container {
     position: relative;
 }
+#loading_container {
+    text-align: center;
+    width: 100%;
+}
+#loading {
+    background-image: url('../img/loading.gif');
+    width: 64px;
+    height: 64px;
+    display: block;
+    margin: 0 auto;
+}

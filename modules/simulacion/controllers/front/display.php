@@ -69,11 +69,11 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                     return 'Can not upload file';
 
                 /* Original file */
-                if (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name, $width, $heigth)){
+                if (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name)){
                     return 'An error occurred during the image upload process.';
                 }
                 /* A smaller one */
-                elseif (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', $product_picture_width, $product_picture_height)){
+                elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', $product_picture_width, $product_picture_height)){
                     return 'An error occurred during the image upload process.';
                 }
                 elseif (!chmod(_PS_UPLOAD_DIR_.$file_name, 0777) || !chmod(_PS_UPLOAD_DIR_.$file_name.'_small', 0777)){
@@ -111,8 +111,7 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         // If PS_IMAGE_QUALITY is activated, the generated image will be a PNG with .jpg as a file extension.
         // This allow for higher quality and for transparency. JPG source files will also benefit from a higher quality
         // because JPG reencoding by GD, even with max quality setting, degrades the image.
-        if (Configuration::get('PS_IMAGE_QUALITY') == 'png_all'
-            || (Configuration::get('PS_IMAGE_QUALITY') == 'png' && $type == IMAGETYPE_PNG) && !$force_type)
+        if (Configuration::get('PS_IMAGE_QUALITY') == 'png_all' || (Configuration::get('PS_IMAGE_QUALITY') == 'png' && $type == IMAGETYPE_PNG) && !$force_type)
             $file_type = 'png';
 
         if (!$src_width)

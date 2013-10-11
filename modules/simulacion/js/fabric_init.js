@@ -569,7 +569,8 @@ function createNewSepia() {
 }
 
 function closeCanvas() {
-    canvas.clear;
+    if(canvas)
+        canvas.clear();
     $.colorbox.close();
     location.reload();
 }
