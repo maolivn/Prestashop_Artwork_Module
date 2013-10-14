@@ -15,31 +15,33 @@
         {counter}
     {/if}
 {/foreach}
+<input type="hidden" value="{$module_link}" name="module_link" id="module_link">
 {literal}
 <script type="text/javascript">
-    $(document).ready(function () {
+    $(function () {
         $('#save_canvas').click(function (e) {
             e.preventDefault();
             var frame = canvas.item(1);
             var frame_obj = frame.getObjects();
             var img = canvas.item(0);
-            var file, dataURL;
+            var file, dataURL, newdataURL;
             var owidth = $('#simulacion_form').find('#width').val();
             var oheight = $('#simulacion_form').find('#height').val();
-            var scale = Math.round(owidth / img.width);
 
-            img.opacity = 1;
-//            canvas.remove(frame);
-
-//            frame_obj[2].stroke = 'transparent';
-            /*$.each(frame_obj, function(i) {
-                frame_obj[i].stroke = 'transparent';
-            });*/
-            canvas.renderAll();
-
+            //Export image with frame
             dataURL = canvas.toDataURL();
             file = dataURLtoBlob(dataURL);
-            var newfile = dataURLtoBlob(img.toDataURL());
+
+            //Set opacity and set size for image before export
+            img.opacity = 1;
+            img.scaleToWidth(owidth);
+            img.scaleToHeight(oheight);
+            canvas.renderAll();
+            //alert(original_img.getWidth()); return false;
+            //Export image only
+            newdataURL = img.toDataURL();
+//            var newfile = dataURLtoBlob(img.toDataURL());
+            var newfile = dataURLtoBlob(newdataURL);
 
             /*$.colorbox.close();
             $('#image-block').html('<img src="'+dataURL+'">');

@@ -131,6 +131,7 @@ class Simulacion extends Module
             CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "simulacion_image`(
             `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `product_id` INT(11) NOT NULL,
+            `cart_id` INT(11) NOT NULL,
             `file` TEXT NOT NULL)";
 
         if (!$result = Db::getInstance()->Execute($sql)) return FALSE;
@@ -166,6 +167,8 @@ class Simulacion extends Module
             $this->context->controller->addCSS($this->_path . 'css/jquery.fileupload-ui.css', 'all');
             $this->context->controller->addCSS($this->_path . 'css/simulacion_style.css', 'all');
             $this->context->controller->addCSS($this->_path . 'css/colorbox.css', 'all');
+            $this->context->controller->addJS($this->_path . 'js/fileupload/jquery.ui.widget.js');
+            $this->context->controller->addJS($this->_path . 'js/fileupload/jquery.fileupload.js');
             $this->context->controller->addJS($this->_path . 'js/fabric.all.1.3.min.js');
             $this->context->controller->addJS($this->_path . 'js/fabric_init.js');
             $this->context->controller->addJS($this->_path . 'js/jquery.colorbox-min.js');

@@ -4,10 +4,30 @@ var canvasScale = 1;
 var canvas = null;
 var state, state_undo = [], state_redo = [];
 var frame;
+var original_img, filesList = new Array();
 $(document).ready(function () {
     //Remove Customize Tabs
     $('#more_info_sheets').find('.customization_block').hide();
     $('#more_info_tabs').find('a[href="#idTab10"]').hide();
+
+    //TODO Upload Original File
+    $('#fileupload').fileupload({
+        url: 'http://tkb.edu.vn/prestashop_simulacion/index.php?fc=module&module=simulacion&controller=upload',
+        type: 'POST',
+        singleFileUploads: true,
+        autoUpload: false,
+        add: function(evt, data) {
+            $('#fileuploadtext').val(data.files[0].name);
+            $('.fileinput-button').removeClass('btn-success').addClass('btn-default');
+            $('#upload_btn').removeAttr('disabled').addClass('btn-success').click(function () {
+                fileSelect(evt);
+                //data.submit();
+            });
+        },
+        done: function(e, data) {
+            console.log(e + data);
+        }
+    });
 });
 $(function () {
     //Popup with canvas
@@ -24,13 +44,13 @@ $(function () {
     createNewSepia();
 
     //File upload handle
-    $('#fileupload').change(function (evt) {
+    /*$('#fileupload').change(function (evt) {
         $('#fileuploadtext').val(evt.target.files[0].name);
         $('.fileinput-button').removeClass('btn-success').addClass('btn-default');
         $('#upload_btn').removeAttr('disabled').addClass('btn-success').click(function (e) {
             fileSelect(evt);
         });
-    });
+    });*/
 
     $('.scale_btn').click(function (e) {
         e.preventDefault();
@@ -188,6 +208,25 @@ function fileSelect(evt) {
                 continue;
             }
 
+            //TODO BOF Upload Original Image
+            /*var owidth = $('#simulacion_form').find('#width').val();
+            var oheight = $('#simulacion_form').find('#height').val();
+
+            var fd = new FormData();
+            fd.append('simulation_image', file);
+
+            $.ajax({
+                url: $('#module_link').val() + '&upload=2&id_product=' + $('#product_page_product_id').val() +'&img_width='+ owidth + '&img_heigth='+ oheight,
+                type: "POST",
+                data: fd,
+                processData: false,
+                contentType: false,
+            }).done(function (response) {
+                    alert(response);
+                });*/
+            //EOF Upload Original Image
+
+            //BOF Load image from reader
             reader = new FileReader();
             reader.onload = (function (tFile) {
                 return function (evt) {
@@ -204,6 +243,7 @@ function fileSelect(evt) {
                 };
             }(file));
             reader.readAsDataURL(file);
+            //EOF Load image from reader
         }
     } else {
         alert('The File APIs are not fully supported in this browser.');
@@ -235,9 +275,8 @@ function initStage(image) {
         hasRotatingPoint: false,
         lockUniScaling: false
     });
-
     imgInstance.id = 'puppy';
-
+    original_img = imgInstance;
 
     //Quality calculate base on centimeter (1 centimeter = 37.79527559055 pixel (X), 1 pixel (X) = 0.02645833333333 centimeter)
     var quality = '';
@@ -361,7 +400,7 @@ function createRect() {
      * new width = original width / original height x new height
      */
 
-    // TODO Ratio calculate script
+    // Ratio calculate script
     /*BOF Calcualte width */
     var frame_height, divide;
     var canvas_width = canvas.getWidth(), canvas_height = canvas.getHeight();

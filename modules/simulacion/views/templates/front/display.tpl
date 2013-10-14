@@ -28,7 +28,7 @@
                             <i class="glyphicon glyphicon-plus"></i>
                             <span id="browse_text">Browse</span>
                             <!-- The file input field used as target for the file upload widget -->
-                            <input id="fileupload" type="file" name="files">
+                            <input id="fileupload" type="file" name="simulacion_files">
                         </span>
                         <button type="button" class="btn btn-sm" id="upload_btn" disabled>{l s='Upload' mod='simulacion'}</button>
                     </div>

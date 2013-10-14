@@ -23,7 +23,6 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ((int)Tools::getValue('upload') == 1) {
 //                print_r($this->pictureUpload((int)Tools::getValue('img_width'), (int)Tools::getValue('img_heigth'))); exit;
-//                echo Tools::getValue('img_width'); exit;
                 // If cart has not been saved, we need to do it so that customization fields can have an id_cart
                 // We check that the cookie exists first to avoid ghost carts
                 if (!$this->context->cart->id && isset($_COOKIE[$this->context->cookie->getName()])) {
@@ -35,6 +34,14 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                     exit;
                 } else {
                     echo 'error';
+                    exit;
+                }
+            } else if ((int)Tools::getValue('upload') == 2) {
+                if($report = $this->pictureUpload((int)Tools::getValue('img_width'), (int)Tools::getValue('img_heigth'))){
+                    print_r($report);
+                    exit;
+                } else {
+                    echo $report;
                     exit;
                 }
             }
@@ -60,7 +67,7 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         }
 
         $indexes = array_flip($authorized_file_fields);
-//        return $_FILES;
+        return $_FILES;
         foreach ($_FILES as $field_name => $file) {
             if(isset($file['tmp_name']) && !empty($file['tmp_name'])) {
                 if (in_array($field_name, $authorized_file_fields))
@@ -91,7 +98,8 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                     if (!$tmp_name || !move_uploaded_file($file['tmp_name'], $tmp_name))
                         return 'Can not upload file';
 
-                    if (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name, $width, $heigth)){
+//                    if (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name, $width, $heigth)){
+                    if (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name)){
                         return 'An error occurred during the image upload process.';
                     }
                     elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', 150, 150)){
@@ -100,7 +108,7 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                     elseif (!chmod(_PS_UPLOAD_DIR_.$file_name, 0777) || !chmod(_PS_UPLOAD_DIR_.$file_name.'_small', 0777)){
                         return 'An error occurred during the image upload process.';
                     } else {
-                        if(!$this->saveImage($this->product->id, $file_name)) return 'Update Error';
+                        //if(!$this->saveImage($this->context->cart->id, $this->product->id, $file_name)) return 'Update Error';
                     }
                 }
                 unlink($tmp_name);
@@ -177,17 +185,17 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         return (ImageManager::write($file_type, $dest_image, $dst_file));
     }
 
-    protected function saveImage($product_id, $filename) {
+    protected function saveImage($cart_id, $product_id, $filename) {
         //Check if image has insert
-        $image = Db::getInstance()->getRow('SELECT id FROM ' . _DB_PREFIX_ . 'simulacion_image WHERE product_id = ' . (int)$product_id);
+        $image = Db::getInstance()->getRow('SELECT id FROM ' . _DB_PREFIX_ . 'simulacion_image WHERE cart_id = ' . (int)$cart_id);
 
         if($image) {
             //Update new image
-            if (Db::getInstance()->update('simulacion_image', array('file' => $filename), 'id = '.(int)$image['id'])) return true;
+            if (Db::getInstance()->update('simulacion_image', array('cart_id' => $cart_id, 'product_id' => $product_id, 'file' => $filename), 'id = '.(int)$image['id'])) return true;
             else return false;
         } else {
             //Insert new image
-            if(Db::getInstance()->insert('simulacion_image', array('product_id' => $product_id,
+            if(Db::getInstance()->insert('simulacion_image', array('cart_id' => $cart_id, 'product_id' => $product_id,
                                                                 'file'      => $filename))) return true;
             else return false;
         }
