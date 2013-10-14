@@ -14,7 +14,7 @@ class Simulacion extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Simulacion');
-        $this->description = $this->l('Description of Simulacion.');
+        $this->description = $this->l('Prestashop Module for creating Artwork.');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
@@ -127,18 +127,30 @@ class Simulacion extends Module
             `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
             `product_id` INT(11) NOT NULL,
             `value` TEXT NOT NULL,
-            `status` INT(11) NOT NULL)";
+            `status` INT(11) NOT NULL);
+            CREATE TABLE IF NOT EXISTS `" . _DB_PREFIX_ . "simulacion_image`(
+            `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+            `product_id` INT(11) NOT NULL,
+            `file` TEXT NOT NULL)";
 
         if (!$result = Db::getInstance()->Execute($sql)) return FALSE;
 
         //EOF Create table
-        return parent::install() && $this->registerHook('header') && $this->registerHook('displayLeftColumnProduct') && $this->registerHook('displayFooterProduct') && $this->registerHook('displayAdminProductsExtra') && $this->registerHook('displayAdminOrder') && $this->registerHook('actionProductSave') && Configuration::updateValue('PS_SIMULACION', 'simulacion');
+        return parent::install() &&
+        $this->registerHook('header') &&
+        $this->registerHook('displayLeftColumnProduct') &&
+        $this->registerHook('displayFooterProduct') &&
+        $this->registerHook('displayAdminProductsExtra') &&
+        $this->registerHook('displayAdminOrder') &&
+        $this->registerHook('actionProductSave') &&
+//        $this->registerHook('displayShoppingCart') &&
+        Configuration::updateValue('PS_SIMULACION', 'simulacion');
     }
 
     public function uninstall()
     {
         //BOF Delete Table
-        $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'simulacion_product`';
+        $sql = 'DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'simulacion_product`; DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'simulacion_image`';
         Db::getInstance()->Execute($sql);
 
         //EOF Delete Table
@@ -201,6 +213,9 @@ class Simulacion extends Module
         return $this->display(__FILE__, 'product.tpl');
     }
 
+    /*public function hookDisplayShoppingCart() {
+        echo 'Hi, cart page';
+    }*/
     public function hookDisplayAdminProductsExtra($params)
     {
         $module_product = $this->getProduct();
@@ -213,12 +228,11 @@ class Simulacion extends Module
 
     public function hookDisplayAdminOrder($params)
     {
-//        echo Tools::getValue('id_order');
         $order = new Order(Tools::getValue('id_order'));
         if (!Validate::isLoadedObject($order))
             throw new PrestaShopException('object can\'t be loaded');
         $products = $this->getAdminOrderProducts($order);
-        $this->context->smarty->assign(array('products' => $products));
+        $this->context->smarty->assign(array('order' => $order, 'products' => $products, 'upload_dir' => _PS_UPLOAD_DIR_, 'site' => __PS_BASE_URI__));
 
         return $this->display(__FILE__, 'admin-order-detail.tpl');
     }
@@ -276,10 +290,13 @@ class Simulacion extends Module
 
     protected function getAdminOrderProducts($order)
     {
+        //Get Product From Order
         $products = $order->getProducts();
-
         foreach ($products as &$product)
         {
+            $id_product = $product['id_product'];
+            $module_img_obj = Db::getInstance()->getRow('SELECT file FROM ' . _DB_PREFIX_ . 'simulacion_image WHERE product_id = ' . (int)$id_product);
+            $products['module_img'] = $module_img_obj['file'];
             if ($product['image'] != null)
             {
                 $name = 'product_mini_'.(int)$product['product_id'].(isset($product['product_attribute_id']) ? '_'.(int)$product['product_attribute_id'] : '').'.jpg';
@@ -295,5 +312,4 @@ class Simulacion extends Module
         return $products;
     }
 }
-
 ?>

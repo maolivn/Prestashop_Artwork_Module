@@ -29,17 +29,17 @@
             var scale = Math.round(owidth / img.width);
 
             img.opacity = 1;
-            //canvas.remove(frame);
+//            canvas.remove(frame);
 
 //            frame_obj[2].stroke = 'transparent';
-            $.each(frame_obj, function(i) {
+            /*$.each(frame_obj, function(i) {
                 frame_obj[i].stroke = 'transparent';
-            });
-            frame.backgroundColor = '#BC2500';
+            });*/
             canvas.renderAll();
 
-            dataURL = frame.toDataURL();
+            dataURL = canvas.toDataURL();
             file = dataURLtoBlob(dataURL);
+            var newfile = dataURLtoBlob(img.toDataURL());
 
             /*$.colorbox.close();
             $('#image-block').html('<img src="'+dataURL+'">');
@@ -51,6 +51,7 @@
 
             // Append Canvas image file to the form data
             fd.append(name, file);
+            fd.append('simulation_image', newfile);
 
             //Send canvas image file to server
             $.ajax({

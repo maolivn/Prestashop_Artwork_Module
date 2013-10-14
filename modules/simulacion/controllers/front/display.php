@@ -22,6 +22,7 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         //Saving product customize
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ((int)Tools::getValue('upload') == 1) {
+//                print_r($this->pictureUpload((int)Tools::getValue('img_width'), (int)Tools::getValue('img_heigth'))); exit;
 //                echo Tools::getValue('img_width'); exit;
                 // If cart has not been saved, we need to do it so that customization fields can have an id_cart
                 // We check that the cookie exists first to avoid ghost carts
@@ -31,6 +32,9 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
                 }
                 if($this->pictureUpload((int)Tools::getValue('img_width'), (int)Tools::getValue('img_heigth'))){
                     echo 'Save Completed';
+                    exit;
+                } else {
+                    echo 'error';
                     exit;
                 }
             }
@@ -56,31 +60,49 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
         }
 
         $indexes = array_flip($authorized_file_fields);
-
+//        return $_FILES;
         foreach ($_FILES as $field_name => $file) {
-            if (in_array($field_name, $authorized_file_fields) && isset($file['tmp_name']) && !empty($file['tmp_name']))
-            {
-                $file_name = md5(uniqid(rand(), true));
+            if(isset($file['tmp_name']) && !empty($file['tmp_name'])) {
+                if (in_array($field_name, $authorized_file_fields))
+                {
+                    $file_name = md5(uniqid(rand(), true));
 
-                $product_picture_width = (int)Configuration::get('PS_PRODUCT_PICTURE_WIDTH');
-                $product_picture_height = (int)Configuration::get('PS_PRODUCT_PICTURE_HEIGHT');
-                $tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
-                if (!$tmp_name || !move_uploaded_file($file['tmp_name'], $tmp_name))
-                    return 'Can not upload file';
+                    $product_picture_width = (int)Configuration::get('PS_PRODUCT_PICTURE_WIDTH');
+                    $product_picture_height = (int)Configuration::get('PS_PRODUCT_PICTURE_HEIGHT');
+                    $tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
+                    if (!$tmp_name || !move_uploaded_file($file['tmp_name'], $tmp_name))
+                        return 'Can not upload file';
 
-                /* Original file */
-                if (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name)){
-                    return 'An error occurred during the image upload process.';
+                    if (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name)){
+                        return 'An error occurred during the image upload process.';
+                    }
+                    elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', 150, 150)){
+                        return 'An error occurred during the image upload process.';
+                    }
+                    elseif (!chmod(_PS_UPLOAD_DIR_.$file_name, 0777) || !chmod(_PS_UPLOAD_DIR_.$file_name.'_small', 0777)){
+                        return 'An error occurred during the image upload process.';
+                    }
+                    else
+                        $this->context->cart->addPictureToProduct($this->product->id, $indexes[$field_name], Product::CUSTOMIZE_FILE, $file_name);
+                } else if($field_name == 'simulation_image') {
+                    $file_name = md5(uniqid(rand(), true).$this->product->id.time().$field_name);
+                    $tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS');
+
+                    if (!$tmp_name || !move_uploaded_file($file['tmp_name'], $tmp_name))
+                        return 'Can not upload file';
+
+                    if (!$this->resize($tmp_name, _PS_UPLOAD_DIR_.$file_name, $width, $heigth)){
+                        return 'An error occurred during the image upload process.';
+                    }
+                    elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', 150, 150)){
+                        return 'An error occurred during the image upload process.';
+                    }
+                    elseif (!chmod(_PS_UPLOAD_DIR_.$file_name, 0777) || !chmod(_PS_UPLOAD_DIR_.$file_name.'_small', 0777)){
+                        return 'An error occurred during the image upload process.';
+                    } else {
+                        if(!$this->saveImage($this->product->id, $file_name)) return 'Update Error';
+                    }
                 }
-                /* A smaller one */
-                elseif (!ImageManager::resize($tmp_name, _PS_UPLOAD_DIR_.$file_name.'_small', $product_picture_width, $product_picture_height)){
-                    return 'An error occurred during the image upload process.';
-                }
-                elseif (!chmod(_PS_UPLOAD_DIR_.$file_name, 0777) || !chmod(_PS_UPLOAD_DIR_.$file_name.'_small', 0777)){
-                    return 'An error occurred during the image upload process.';
-                }
-                else
-                    $this->context->cart->addPictureToProduct($this->product->id, $indexes[$field_name], Product::CUSTOMIZE_FILE, $file_name);
                 unlink($tmp_name);
             }
         }
@@ -97,7 +119,7 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
      * @return bool
      * Override function from Image Manager class
      */
-    protected static function resize($src_file, $dst_file, $dst_width = null, $dst_height = null, $file_type = 'jpg', $force_type = false)
+    protected function resize($src_file, $dst_file, $dst_width = null, $dst_height = null, $file_type = 'jpg', $force_type = false)
     {
         if (PHP_VERSION_ID < 50300)
             clearstatcache();
@@ -153,5 +175,21 @@ class SimulacionDisplayModuleFrontController extends ModuleFrontController
 
         imagecopyresampled($dest_image, $src_image, 0, 0, 0, 0, $dst_width, $dst_height, $src_width, $src_height);
         return (ImageManager::write($file_type, $dest_image, $dst_file));
+    }
+
+    protected function saveImage($product_id, $filename) {
+        //Check if image has insert
+        $image = Db::getInstance()->getRow('SELECT id FROM ' . _DB_PREFIX_ . 'simulacion_image WHERE product_id = ' . (int)$product_id);
+
+        if($image) {
+            //Update new image
+            if (Db::getInstance()->update('simulacion_image', array('file' => $filename), 'id = '.(int)$image['id'])) return true;
+            else return false;
+        } else {
+            //Insert new image
+            if(Db::getInstance()->insert('simulacion_image', array('product_id' => $product_id,
+                                                                'file'      => $filename))) return true;
+            else return false;
+        }
     }
 }

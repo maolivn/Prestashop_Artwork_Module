@@ -44,7 +44,6 @@
         <!-- Center Column -->
         <div class="col-md-6">
             <canvas width="655" height="530" id="c"></canvas>
-            <canvas width="{$width}" height="{$height}" id="d"></canvas>
             <span id="quality_text" class="col-md-4 col-md-offset-4"></span>
         </div>
 
