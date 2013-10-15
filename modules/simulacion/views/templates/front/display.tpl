@@ -23,6 +23,7 @@
                     <input type="text" name="fileuploadtext" id="fileuploadtext" class='form-control' disabled>
                 </div>
                 <div class="row">
+                    <form enctype="multipart/form-data" method="post" name="upload_canvas_form">
                     <div class="col-md-12">
                         <span class="btn btn-success btn-sm fileinput-button">
                             <i class="glyphicon glyphicon-plus"></i>
@@ -32,6 +33,7 @@
                         </span>
                         <button type="button" class="btn btn-sm" id="upload_btn" disabled>{l s='Upload' mod='simulacion'}</button>
                     </div>
+                    </form>
                 </div>
             </div>
             {l s='Dimensiones' mod='simulacion'}<br>

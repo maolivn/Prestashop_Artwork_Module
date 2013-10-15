@@ -1,1 +1,1 @@
-{include file='../front/display.tpl'}
+{include file='../front/display.tpl'}

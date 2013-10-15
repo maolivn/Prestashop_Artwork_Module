@@ -11,7 +11,7 @@ $(document).ready(function () {
     $('#more_info_tabs').find('a[href="#idTab10"]').hide();
 
     //TODO Upload Original File
-    $('#fileupload').fileupload({
+    /*$('#fileupload').fileupload({
         url: 'http://tkb.edu.vn/prestashop_simulacion/index.php?fc=module&module=simulacion&controller=upload',
         type: 'POST',
         singleFileUploads: true,
@@ -27,7 +27,7 @@ $(document).ready(function () {
         done: function(e, data) {
             console.log(e + data);
         }
-    });
+    });*/
 });
 $(function () {
     //Popup with canvas
@@ -44,13 +44,13 @@ $(function () {
     createNewSepia();
 
     //File upload handle
-    /*$('#fileupload').change(function (evt) {
+    $('#fileupload').change(function (evt) {
         $('#fileuploadtext').val(evt.target.files[0].name);
         $('.fileinput-button').removeClass('btn-success').addClass('btn-default');
         $('#upload_btn').removeAttr('disabled').addClass('btn-success').click(function (e) {
             fileSelect(evt);
         });
-    });*/
+    });
 
     $('.scale_btn').click(function (e) {
         e.preventDefault();
@@ -89,18 +89,21 @@ $(function () {
         var elm = $(this);
         canvas.forEachObject(function (o) {
             if (o.id == 'puppy') {
+                var owidth = $('#simulacion_form').find('#width').val();
+                var oheight = $('#simulacion_form').find('#height').val();
                 if (elm.attr('id') == 'fit_width') {
                     o.scaleToWidth(canvas.getWidth());
                 } else if (elm.attr('id') == 'fit_height') {
                     o.scaleToHeight(canvas.getHeight());
                 } else {
+                    o.scaleToWidth(canvas.getWidth());
                     o.center();
                 }
                 o.setCoords();
             }
         });
         canvas.renderAll();
-        canvas.calcOffset()
+        canvas.calcOffset();
         frame_update();
     });
 
@@ -299,7 +302,7 @@ function initStage(image) {
     //Create frame group
     var rect_group = createRect();
 
-    canvas.setDimensions({width: 655, height: 538});
+//    canvas.setDimensions({width: 655, height: 538});
 
     canvas.add(imgInstance);
     imgInstance.center().setCoords();
@@ -533,7 +536,7 @@ function resetZoom() {
     canvasScale = 1;
 }
 
-function dataURLtoBlob(dataURL) {
+/*function dataURLtoBlob(dataURL) {
     // Decode the dataURL
     var binary = atob(dataURL.split(',')[1]);
     // Create 8-bit unsigned array
@@ -543,7 +546,7 @@ function dataURLtoBlob(dataURL) {
     }
     // Return our Blob object
     return new Blob([new Uint8Array(array)], {type: 'image/png'});
-}
+}*/
 
 function createNewSepia() {
     // set of sepia colors

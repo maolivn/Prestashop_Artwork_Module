@@ -167,8 +167,9 @@ class Simulacion extends Module
             $this->context->controller->addCSS($this->_path . 'css/jquery.fileupload-ui.css', 'all');
             $this->context->controller->addCSS($this->_path . 'css/simulacion_style.css', 'all');
             $this->context->controller->addCSS($this->_path . 'css/colorbox.css', 'all');
-            $this->context->controller->addJS($this->_path . 'js/fileupload/jquery.ui.widget.js');
-            $this->context->controller->addJS($this->_path . 'js/fileupload/jquery.fileupload.js');
+//            $this->context->controller->addJS($this->_path . 'js/fileupload/jquery.ui.widget.js');
+//            $this->context->controller->addJS($this->_path . 'js/fileupload/jquery.fileupload.js');
+            $this->context->controller->addJS($this->_path . 'js/canvas-to-blob.min.js');
             $this->context->controller->addJS($this->_path . 'js/fabric.all.1.3.min.js');
             $this->context->controller->addJS($this->_path . 'js/fabric_init.js');
             $this->context->controller->addJS($this->_path . 'js/jquery.colorbox-min.js');
@@ -182,6 +183,7 @@ class Simulacion extends Module
 
     public function hookDisplayFooterProduct($params)
     {
+//        echo Tools::getMemoryLimit(); exit;
         //Get customize picture
         $id_product = (int)Tools::getValue('id_product');
         $product    = new Product($id_product, TRUE, $this->context->language->id, $this->context->shop->id);
