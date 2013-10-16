@@ -297,11 +297,14 @@ class Simulacion extends Module
     {
         //Get Product From Order
         $products = $order->getProducts();
+
         foreach ($products as &$product)
         {
-            $id_product = $product['id_product'];
-            $module_img_obj = Db::getInstance()->getRow('SELECT file FROM ' . _DB_PREFIX_ . 'simulacion_image WHERE product_id = ' . (int)$id_product);
+            //Get Simulacion Image
+            $cart_id = $order->id_cart;
+            $module_img_obj = Db::getInstance()->getRow('SELECT file FROM ' . _DB_PREFIX_ . 'simulacion_image WHERE cart_id = ' . (int)$cart_id);
             $products['module_img'] = $module_img_obj['file'];
+
             if ($product['image'] != null)
             {
                 $name = 'product_mini_'.(int)$product['product_id'].(isset($product['product_attribute_id']) ? '_'.(int)$product['product_attribute_id'] : '').'.jpg';

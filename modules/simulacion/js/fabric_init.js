@@ -9,25 +9,6 @@ $(document).ready(function () {
     //Remove Customize Tabs
     $('#more_info_sheets').find('.customization_block').hide();
     $('#more_info_tabs').find('a[href="#idTab10"]').hide();
-
-    //TODO Upload Original File
-    /*$('#fileupload').fileupload({
-        url: 'http://tkb.edu.vn/prestashop_simulacion/index.php?fc=module&module=simulacion&controller=upload',
-        type: 'POST',
-        singleFileUploads: true,
-        autoUpload: false,
-        add: function(evt, data) {
-            $('#fileuploadtext').val(data.files[0].name);
-            $('.fileinput-button').removeClass('btn-success').addClass('btn-default');
-            $('#upload_btn').removeAttr('disabled').addClass('btn-success').click(function () {
-                fileSelect(evt);
-                //data.submit();
-            });
-        },
-        done: function(e, data) {
-            console.log(e + data);
-        }
-    });*/
 });
 $(function () {
     //Popup with canvas
@@ -149,6 +130,7 @@ $(function () {
     });
 
     $('#sepia_filter').click(function (e) {
+        return false;
         e.preventDefault();
         canvasSaveState();
         canvas.forEachObject(function (o) {
@@ -169,6 +151,7 @@ $(function () {
     });
 
     $('#undo').click(function () {
+        return false;
         if (state_undo.length == 0) return false;
         var undo = state_undo[state_undo.length - 1];
         state_redo.push(undo);
@@ -181,6 +164,7 @@ $(function () {
     });
 
     $('#redo').click(function () {
+        return false;
         if (state_redo.length == 0) return false;
         var redo = state_redo[0];
 
@@ -210,24 +194,6 @@ function fileSelect(evt) {
             if (!file.type.match('image.*')) {
                 continue;
             }
-
-            //TODO BOF Upload Original Image
-            /*var owidth = $('#simulacion_form').find('#width').val();
-            var oheight = $('#simulacion_form').find('#height').val();
-
-            var fd = new FormData();
-            fd.append('simulation_image', file);
-
-            $.ajax({
-                url: $('#module_link').val() + '&upload=2&id_product=' + $('#product_page_product_id').val() +'&img_width='+ owidth + '&img_heigth='+ oheight,
-                type: "POST",
-                data: fd,
-                processData: false,
-                contentType: false,
-            }).done(function (response) {
-                    alert(response);
-                });*/
-            //EOF Upload Original Image
 
             //BOF Load image from reader
             reader = new FileReader();
@@ -536,7 +502,12 @@ function resetZoom() {
     canvasScale = 1;
 }
 
-/*function dataURLtoBlob(dataURL) {
+/**
+ * @ignore replace by Canvas to blob plugin
+ * @param dataURL
+ * @returns {Blob}
+ */
+function dataURLtoBlob(dataURL) {
     // Decode the dataURL
     var binary = atob(dataURL.split(',')[1]);
     // Create 8-bit unsigned array
@@ -546,7 +517,7 @@ function resetZoom() {
     }
     // Return our Blob object
     return new Blob([new Uint8Array(array)], {type: 'image/png'});
-}*/
+}
 
 function createNewSepia() {
     // set of sepia colors

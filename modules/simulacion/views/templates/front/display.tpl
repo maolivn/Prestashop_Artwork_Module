@@ -36,10 +36,10 @@
                     </form>
                 </div>
             </div>
-            {l s='Dimensiones' mod='simulacion'}<br>
+            {*{l s='Dimensiones' mod='simulacion'}<br>
             <br>
             {$width}x{$height}
-            <br>
+            <br>*}
             {$text}
         </div>
 
@@ -123,7 +123,7 @@
                         </div>
 
                         <!-- Right Column -->
-                        <div class="sections">
+                        <div class="col-md-2 sections">
                             <div id="pad_right">
                                 <a href="#" id="right" class="move_btn">
                                     <span class="arrow-right"></span>
@@ -136,7 +136,7 @@
                     <span>{l s='Filter' mod='simulacion'}</span>
                 </div>
                 <div class="control_group border_top clearfix">
-                        <span class="btn btn-default" style="margin-top: 5px">
+                        <span class="btn btn-default disabled" style="margin-top: 5px">
                             <a href="#" id="sepia_filter">{l s='Sepia' mod='simulacion'}</a>
                         </span>
                         <span class="btn btn-default" style="margin-top: 5px">
