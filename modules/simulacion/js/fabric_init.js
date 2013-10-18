@@ -77,7 +77,7 @@ $(function () {
                 } else if (elm.attr('id') == 'fit_height') {
                     o.scaleToHeight(canvas.getHeight());
                 } else {
-                    o.scaleToWidth(canvas.getWidth());
+//                    o.scaleToWidth(canvas.getWidth());
                     o.center();
                 }
                 o.setCoords();
@@ -371,20 +371,20 @@ function createRect() {
 
     // Ratio calculate script
     /*BOF Calcualte width */
-    var frame_height, divide;
+    var divide;
     var canvas_width = canvas.getWidth(), canvas_height = canvas.getHeight();
     var original_width = $('#simulacion_form').find('#width').val();
     var original_height = $('#simulacion_form').find('#height').val();
-    var frame_width = (canvas.getWidth() - 40) / parseInt(frame);
-    var new_height = original_height /original_width  * canvas_width;
-//    var new_width = Math.round(original_width / original_height * canvas_height);
-;
-    if (new_height > canvas_height) {
-        divide = new_height / canvas_height;
+    var frame_width = (canvas.getWidth()-40) / parseInt(frame), frame_height;
+//    var new_height = original_height /original_width  * frame_width;
+//    var new_width = original_width / original_height * canvas_height;
+
+    if(frame == 1) frame_width = frame_width / 2;
+    frame_height = original_height /original_width  * frame_width;
+
+    if (frame_height > canvas_height) {
         frame_height = canvas_height - 10;
-        frame_width = (frame_width / divide) - 10;
-    } else {
-        frame_height = new_height;
+        frame_width = original_width / original_height * frame_height;
     }
     /*EOF Calcualte width */
 
